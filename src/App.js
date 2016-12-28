@@ -10,7 +10,18 @@ class App extends Component {
     this.ind = 0;
     this.state = {
       addModalOpen: false,
-      cands: this.getInitialCandidates()
+      cands: this.getInitialCands(),
+    }
+  }
+
+  getInitialCands() {
+    const initialCand = {
+      name: "+",
+      color: '#FFFFFF',
+      onClick: this.showAddCandModal.bind(this)
+    };
+    return {
+      new: initialCand
     }
   }
 
@@ -29,12 +40,7 @@ class App extends Component {
     for(const id of ids){
       serverCands[id].onClick = this.voteCand.bind(this, id)
     }
-    const initialCand = {
-      name: "+",
-      color: randomColor(),
-      onClick: this.showAddCandModal.bind(this)
-    }
-    serverCands.newCand = initialCand    
+    serverCands.newCand = this.getInitialCands().new   
     this.setState({cands: serverCands})
   }
 
@@ -53,40 +59,21 @@ class App extends Component {
     rootRef.on('value', this.onChangeCands.bind(this));
   }
 
-  writeNewCand(newCand) {
+  writeNewCand(name) {
     firebase.database().ref().child('cands').push({
-        name: newCand.name,
+        name: name,
         color: randomColor(),
         votes: 0,
     });
   }  
   addCand(name) {
-    const cands = this.state.cands;
-    const col = randomColor();
-    const newCand = {
-      name: name,
-      color: col,
-      onClick: this.voteCand.bind(this, name)
-    }
-    this.writeNewCand(newCand);
+    this.writeNewCand(name);
     this.setState({ 
       addModalOpen: false
     });
   }
   showAddCandModal() {
     this.setState({addModalOpen: true});
-  }
-  getInitialCandidates() {
-    const cands = [];
-    const initialCand = {
-      id: this.ind++,
-      name: "+",
-      color: randomColor(),
-      onClick: this.showAddCandModal.bind(this)
-    }
-    //this.addCand.bind(this, "newCand")
-    cands.unshift(initialCand);
-    return cands;
   }
   renderModal() {
     return (
