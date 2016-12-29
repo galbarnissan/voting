@@ -11,6 +11,7 @@ class App extends Component {
     this.state = {
       addModalOpen: false,
       cands: this.getInitialCands(),
+      alreadyVoted: false      
     }
   }
 
@@ -30,7 +31,8 @@ class App extends Component {
     var candVotesRef = firebase.database().ref().child('cands').child(id).child('votes');
     candVotesRef.transaction(function(currentVotes) {
       return currentVotes+1;
-    });    
+    });
+    this.setState({alreadyVoted: true})    
   }
 
   onChangeCands(snap) {
@@ -94,6 +96,7 @@ class App extends Component {
       <div className="App">
         {this.renderModal()}
         <CandidatesContainer
+          alreadyVoted={this.state.alreadyVoted}
           candidates={this.state.cands}
         />
       </div>
